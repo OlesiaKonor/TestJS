@@ -1,21 +1,21 @@
 let clicks = 0;
-
 let currentRectX = 0;
 let currentRectY = 0;
 let currentRectWidth = 0;
 let currentRectHeight = 0;
 
-const TIMEOUT = 5000;
+let button = document.getElementById('start');
 
-const display = document.querySelector('#time-header');
-const button = document.getElementById('start');
-const counter = document.querySelector('#counter');
+const display = document.getElementById('time-header');
+const counter = document.getElementById('counter');
 const canvas = document.getElementById("game");
 
-button.onclick = start;
-canvas.onclick = null; 
+button.addEventListener('click', start);
 
-function start () { 
+function start () {
+    canvas.addEventListener('click', canvasClick);
+    let gt = document.getElementById('game-time'); //время игры
+    let TIMEOUT = gt.value * 1000;
     const startTime = Date.now();
 
     display.textContent = formatTime (TIMEOUT);
@@ -25,38 +25,30 @@ function start () {
     clearCanvas();
     drawRectangle();
 
-    canvas.onclick = canvasClick; 
-    
-    const interval = setInterval(() => { 
+    const interval = setInterval(() => { //отображение времени
         const delta = Date.now () - startTime
-        display.textContent = formatTime (TIMEOUT - delta); 
-    } , 100) ; 
+        display.textContent = formatTime (TIMEOUT- delta); 
+    } , 10) ; 
 
-    const timeout = setTimeout(() => {
-        button.onclick = start;
-        canvas.onclick = null; 
+    const timeout = setTimeout(() => {//Конец Игры
         button.style.display = 'block';
         display.textContent = 'Game Over';
 
         clearCanvas();
+        canvas.removeEventListener('click', canvasClick)
         clearInterval (interval);
         clearTimeout (timeout);
 
     }, TIMEOUT);
-
-     
 }
 
 function canvasClick(event)
 {
-    
     const x = event.clientX - canvas.offsetLeft - canvas.offsetParent.offsetLeft;
-    const y = event.clientY - canvas.offsetParent.offsetTop;
-
+    const y = event.clientY - canvas.offsetTop - canvas.offsetParent.offsetTop;
     //alert("Click on x:" + x + " y: " + y);
 
-    if (x > currentRectX && x < currentRectX + currentRectWidth &&
-        y > currentRectY && y < currentRectY + currentRectHeight)   
+    if (x > currentRectX && x < currentRectX + currentRectWidth && y > currentRectY && y < currentRectY + currentRectHeight*2)
     {
         clicks++;
         counter.textContent = clicks;
@@ -67,36 +59,27 @@ function canvasClick(event)
 
 function drawRectangle() {
     const ctx = canvas.getContext("2d");
-
-    // Math.random() выдает случайное число [0; 1]
-    // Math.floor() округляет число вниз (например, 10.8 округлится до 10)
-    
-
-    const halfOfMaxRectangleSize = 50;
-
-    const randomX = Math.floor(Math.random() * (canvas.width - halfOfMaxRectangleSize * 2));
-    const randomY = Math.floor(Math.random() * (canvas.height - halfOfMaxRectangleSize * 2));
-
-    const randomWidth = Math.floor(Math.random() * halfOfMaxRectangleSize) + halfOfMaxRectangleSize; //случайное число от 50 до 99
-    const randomHeight = Math.floor(Math.random() * halfOfMaxRectangleSize) + halfOfMaxRectangleSize;
-
-    
+    const MaxRectangleSize = 100;
     const randomColor = '#'+(0x1000000+Math.random()*0xffffff).toString(16).substr(1,6);
 
-    ctx.fillStyle = randomColor;
-    ctx.fillRect(randomX, randomY, randomWidth, randomHeight);
+    currentRectX = Math.floor(Math.random() * (canvas.width - MaxRectangleSize))
+    currentRectY = Math.floor(Math.random() * (canvas.height - MaxRectangleSize));
+    currentRectWidth = Math.floor(Math.random() * MaxRectangleSize/2) + MaxRectangleSize/2;
+    currentRectHeight = Math.floor(Math.random() * MaxRectangleSize/2) + MaxRectangleSize/2;
 
-    currentRectX = randomX;
-    currentRectY = randomY;
-    currentRectWidth = randomWidth;
-    currentRectHeight = randomHeight;
+    ctx.fillStyle = randomColor;
+    ctx.fillRect(currentRectX, currentRectY, currentRectWidth, currentRectHeight);
 }
+
+
+
+
 
 function clearCanvas() {
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
-function formatTime (ms) { 
+function formatTime (ms) { // отображение времени
     return Number.parseFloat(ms/1000).toFixed(2);
 }

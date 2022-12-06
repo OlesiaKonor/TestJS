@@ -28,19 +28,19 @@ body {
   border-radius: 10px;
 }
 
-.app__header {
+.app_header {
   padding: 20px;
   text-align: center;
 }
 
-.app__content {
+.app_content {
   display: flex;
   position: relative;
   align-items: center;
   justify-content: center;
 }
 
-.app__footer {
+.app_footer {
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -81,7 +81,7 @@ body {
 
 .game {
   position: relative;
-  display: flex;
+  display: block;
   align-items: center;
   justify-content: center;
   border: 1px solid #ccc;
